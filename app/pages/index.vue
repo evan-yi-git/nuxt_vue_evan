@@ -8,7 +8,7 @@
           <p class="nickname">大吉 / Evan</p>
         </div>
         <div class="avatar-box">
-          <img src="https://unsplash.com" alt="尹俊哲" class="project-img object-cover w-full h-full" />
+          <img src="/img/pic_00.jpg" alt="尹俊哲" class="project-img object-cover w-full h-full" />
         </div>
         <div class="header-right">
           <h2 class="job-title">前端設計師</h2>
@@ -22,7 +22,7 @@
 
       <div v-for="(item, index) in timelineData" :key="index" class="timeline-item">
         
-        <!-- 左側區塊：日期、手機標題、3D 品牌牆、品牌成果圖 -->
+        <!-- 【左側區塊】：包含日期、手機標題、左側 3D 品牌牆 -->
         <div class="item-left-block">
           <div class="date-header">
             <span class="date-year">{{ item.year }}</span>
@@ -37,16 +37,14 @@
             <p class="intro-content mobile-only-content">{{ item.content }}</p>
           </div>
 
-          <!-- 💡 3D 視差品牌牆：維持純 div，帶有 data-tilt 3D 屬性，不帶任何網址 -->
+          <!-- 左側品牌牆大容器 -->
           <div v-if="item.brands && item.brands.length" class="brand-timeline-container">
-            <div 
-              :class="['brand-grid', item.brandGridClass, { 'is-expanded': item.isExpanded }]"
-              :style="{ maxHeight: item.isExpanded ? '2000px' : item.maxHeightPx + 'px' }"
-            >
+            <!-- 💡 核心修改：移除 HTML 中的 inline style maxHeight 控制，全部交由更靈活的 SCSS 類別控制 -->
+            <div :class="['brand-grid', item.brandGridClass, { 'is-expanded': item.isExpanded }]">
               <div 
                 v-for="(brand, bIndex) in item.brands" 
                 :key="bIndex" 
-                :class="['brand-card', brand.cardClass, { 'hidden-card': bIndex >= 16 && !item.isExpanded }]"
+                :class="['brand-card', brand.cardClass, { 'hidden-card': bIndex >= 16 }]"
                 data-tilt
                 data-tilt-max="15"
                 data-tilt-speed="400"
@@ -54,14 +52,17 @@
                 data-tilt-max-glare="0.25"
               >
                 <div class="tilt-inner">
-                  <span :class="['brand-main', brand.accentClass]" v-html="brand.name"></span>
-                  <span v-if="brand.sub" class="brand-sub">{{ brand.sub }}</span>
+                  <img v-if="brand.img" :src="brand.img" :alt="brand.name" class="brand-logo-img" style="max-width: 90%; max-height: 52px; object-fit: contain; display: block; margin: 0 auto;" />
+                  <template v-else>
+                    <span :class="['brand-main', brand.accentClass]" v-html="brand.name"></span>
+                    <span v-if="brand.sub" class="brand-sub">{{ brand.sub }}</span>
+                  </template>
                 </div>
               </div>
             </div>
 
-            <!-- 展開收合按鈕 -->
-            <div v-if="item.brands.length > 16" class="expand-btn-wrapper">
+            <!-- 💡 核心修改：按鈕加上 mobile-only-btn 類別，確保在電腦版自動完全隱藏 -->
+            <div v-if="item.brands.length > 16" class="expand-btn-wrapper mobile-only-btn">
               <button class="expand-toggle-btn" @click="toggleExpand(item)">
                 {{ item.isExpanded ? '收合品牌牆 ▲' : '展開更多品牌 ▼' }}
               </button>
@@ -78,19 +79,17 @@
           </div>
         </div>
 
-        <!-- 右側區塊：電腦版標題、內文、內文成果圖 -->
+        <!-- 【右側區塊】：放置內文、成果圖、以及右側 3D 品牌牆 -->
         <div class="item-right-block" :class="{ 'final-text-block': !item.content }">
-          
           <div class="desktop-intro-header">
             <h3 class="intro-title">{{ item.title }}</h3>
             <h4 class="intro-subtitle">{{ item.subtitle }}</h4>
             <p class="intro-tech-stack">{{ item.techStack }}</p>
           </div>
 
-          <p v-if="item.content" class="intro-content desktop-only-content">
-            {{ item.content }}
-          </p>
+          <p v-if="item.content" class="intro-content desktop-only-content">{{ item.content }}</p>
 
+          <!-- 右側成果圖片 -->
           <div v-if="item.images && item.images.length" class="project-images-wrapper pt-12">
             <div v-if="item.imageType === 'pc'" class="mockup-pc-container">
               <div class="mockup-pc-card shadow-lg border border-slate-200 rounded">
@@ -103,7 +102,39 @@
               </div>
             </div>
           </div>
+
+          <!-- 右側專屬的「雙排跨界合作品牌牆」 -->
+          <div v-if="item.rightBrands && item.rightBrands.length" class="right-brand-timeline-container pt-12">
+            <!-- 💡 核心修改：右側也同步加上 .is-expanded 類別控制 -->
+            <div :class="['brand-grid grid-2', { 'is-expanded': item.isRightExpanded }]">
+              <div 
+                v-for="(rBrand, rbIndex) in item.rightBrands" 
+                :key="rbIndex"
+                :class="['brand-card', { 'hidden-card': rbIndex >= 16 }]"
+                data-tilt
+                data-tilt-max="15"
+                data-tilt-speed="400"
+                data-tilt-glare="true"
+                data-tilt-max-glare="0.2"
+              >
+                <div class="tilt-inner">
+                  <img v-if="rBrand.img" :src="rBrand.img" :alt="rBrand.name" class="brand-logo-img" style="max-width: 90%; max-height: 52px; object-fit: contain; display: block; margin: 0 auto;" />
+                  <template v-else>
+                    <span class="brand-main" v-html="rBrand.name"></span>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- 💡 核心修改：右側專屬的手機版折疊按鈕 -->
+            <div v-if="item.rightBrands.length > 16" class="expand-btn-wrapper mobile-only-btn">
+              <button class="expand-toggle-btn" @click="toggleRightExpand(item)">
+                {{ item.isRightExpanded ? '收合品牌牆 ▲' : '展開更多品牌 ▼' }}
+              </button>
+            </div>
+          </div>
         </div>
+        
 
       </div>
     </main>
@@ -130,31 +161,69 @@ const timelineData = reactive([
     brandGridClass: 'grid-4',
     isExpanded: false,
     maxHeightPx: 320, 
+    isExpanded: false,      // 左側展開狀態
+    isRightExpanded: false, // 💡 新增：右側展開狀態
+    // 左側 20 家品牌與對應 Logo 圖片
     brands: [
-      { name: 'LCY GROUP', sub: '李長榮集團', accentClass: 'accent-amber'},
-      { name: 'RITEK 錸德集團', accentClass: 'accent-blue'},
-      { name: '台灣電力公司', accentClass: 'accent-cyan'},
-      { name: 'ANdes', sub: 'Technology', accentClass: 'accent-indigo', cardClass: 'uppercase'},
-      { name: '國都豐田服務網', sub: 'TOYOTA LEXUS', accentClass: 'accent-red'},
-      { name: '北部豐田汽車', sub: '線上服務網', cardClass: 'text-xs'},
-      { name: '幼獅文化', accentClass: 'text-green-600 font-bold'},
-      { name: '大樹藥局', accentClass: 'text-emerald-700 font-bold'},
-      { name: '世紀貿易', accentClass: 'text-blue-600 font-bold'}, 
-      { name: '三通公司', accentClass: 'text-slate-600 font-medium'}, 
-      { name: '全生中醫診所', accentClass: 'text-purple-800'},
-      { name: '聖波竹炭', accentClass: 'text-red-900 font-bold'},
-      { name: '錦銘鋁門窗', accentClass: 'text-red-500 font-bold'},
-      { name: 'SUN MARK', sub: '桑瑪克隔熱紙', accentClass: 'font-black italic'},
-      { name: '龍膜 LLumar', sub: 'WINDOW FILM', accentClass: 'font-bold'},
-      { name: '台灣臨床腫瘤學會', cardClass: 'text-xs font-bold text-blue-900'},
-      { name: 'ATNG 艾騰', accentClass: 'text-red-700 font-black'}, 
-      { name: 'OMV 奧地利石油', fontClass: 'font-mono tracking-tighter'},
-      { name: '台灣智天貿易', sub: 'CHIH TIEN', accentClass: 'text-green-600'}, 
-      { name: 'SUNNIC 興意', accentClass: 'text-blue-500', }
+      { name: 'LCY GROUP', sub: '李長榮集團', accentClass: 'accent-amber', img: '/img/pic_03.jpg' },
+      { name: 'RITEK 錸德集團', accentClass: 'accent-blue', img: '/img/pic_05.jpg' },
+      { name: '台灣電力公司', accentClass: 'accent-cyan', img: '/img/pic_07.jpg' },
+      { name: 'ANdes', sub: 'Technology', accentClass: 'accent-indigo', cardClass: 'uppercase', img: '/img/pic_09.jpg' },
+      { name: '國都豐田服務網', sub: 'TOYOTA LEXUS', accentClass: 'accent-red', img: '/img/pic_15.jpg' },
+      { name: '北部豐田汽車', sub: '線上服務網', cardClass: 'text-xs', img: '/img/pic_16.jpg' },
+      { name: '幼獅文化', accentClass: 'text-green-600 font-bold', img: '/img/pic_17.jpg' },
+      { name: '大樹藥局', accentClass: 'text-emerald-700 font-bold', img: '/img/pic_18.jpg' },
+      { name: '世紀貿易', accentClass: 'text-blue-600 font-bold', img: '/img/pic_26.jpg' }, 
+      { name: '三通公司', accentClass: 'text-slate-600 font-medium', img: '/img/pic_27.jpg' }, 
+      { name: '全生中醫診所', accentClass: 'text-purple-800', img: '/img/pic_28.jpg' },
+      { name: '聖波竹炭', accentClass: 'text-red-900 font-bold', img: '/img/pic_29.jpg' },
+      { name: '錦銘鋁門窗', accentClass: 'text-red-500 font-bold', img: '/img/pic_34.jpg' },
+      { name: 'SUN MARK', sub: '桑瑪克隔熱紙', accentClass: 'font-black italic', img: '/img/pic_35.jpg' },
+      { name: '龍膜 LLumar', sub: 'WINDOW FILM', accentClass: 'font-bold', img: '/img/pic_36.jpg' },
+      { name: '台灣臨床腫瘤學會', cardClass: 'text-xs font-bold text-blue-900', img: '/img/pic_37.jpg' },
+      { name: 'ATNG 艾騰', accentClass: 'text-red-700 font-black', img: '/img/pic_46.jpg' }, 
+      { name: 'OMV 奧地利石油', fontClass: 'font-mono tracking-tighter', img: '/img/pic_47.jpg' },
+      { name: '台灣智天貿易', sub: 'CHIH TIEN', accentClass: 'text-green-600', img: '/img/pic_48.jpg' }, 
+      { name: 'SUNNIC 興意', accentClass: 'text-blue-500', img: '/img/pic_49.jpg' }
     ],
-    brandImages: ['https://unsplash.com'],
+    brandImages: ['/img/pic_62.jpg'],
     imageType: 'pc',
-    images: ['https://unsplash.com']
+    images: ['/img/pic_20.jpg'],
+    
+    rightBrands: [
+      { name: 'TIPA 智慧財產培訓學院', img: '/img/pic_39.jpg' },
+      { name: '衛生福利部 全國解毒劑儲備網', img: '/img/pic_41.jpg' },
+      
+      { name: 'UPSC 聯合專利商標事務所', img: '/img/pic_52.jpg' },
+      { name: '國立臺灣大學光電工程學研究所', img: '/img/pic_53.jpg' },
+      { name: '法律事務所', img: '/img/pic_56.jpg' },
+      { name: '台灣癌症學會', img: '/img/pic_57.jpg' },
+      
+      { name: '台北市報業商業同業公會', img: '/img/pic_66.jpg' },
+      { name: '霍特科技', img: '/img/pic_67.jpg' },
+      { name: '台灣房屋營建產業協會', img: '/img/pic_70.jpg' },
+      { name: 'CHANT OIL', img: '/img/pic_71.jpg' },
+      { name: '台灣營建防水技術協進會 WTA', img: '/img/pic_74.jpg' },
+      { name: '天磊 樹木保護', img: '/img/pic_75.jpg' },
+      { name: 'GOGO SPORTS', img: '/img/pic_78.jpg' },
+      { name: 'Happy Marian 快樂瑪麗安', img: '/img/pic_79.jpg' },
+      { name: 'SAIACO 先鋒股份有限公司', img: '/img/pic_82.jpg' },
+      { name: 'FormoLight', img: '/img/pic_83.jpg' },
+      { name: '聯群精密彈簧有限公司', img: '/img/pic_86.jpg' },
+      { name: '偉林企業有限公司', img: '/img/pic_87.jpg' },
+      { name: '世紀自動化股份有限公司', img: '/img/pic_90.jpg' },
+      { name: 'Freser 菲瑞瑟', img: '/img/pic_91.jpg' },
+      { name: 'TAIWAN ENDURANCE', img: '/img/pic_94.jpg' },
+      { name: 'SUNPOWER', img: '/img/pic_95.jpg' },
+      { name: 'KoreaNanometer', img: '/img/pic_98.jpg' },
+      { name: '重德汽車 ONLY BMW', img: '/img/pic_99.jpg' },
+      { name: 'DENO 丹龍隔熱紙', img: '/img/pic_102.jpg' },
+      { name: '藍天', img: '/img/pic_103.jpg' },
+      { name: '緯譽 WEYU', img: '/img/pic_106.jpg' },
+      { name: '群展汽車大燈翻新', img: '/img/pic_107.jpg' },
+      { name: 'CARDIO', img: '/img/pic_111.jpg' },
+      { name: '宏陽汽車大燈維修隔熱紙', img: '/img/pic_112.jpg' }
+    ]
   },
   {
     year: '2011~2013',
@@ -247,6 +316,15 @@ const timelineData = reactive([
 // 點擊展開事件（並重新初始化視差傾斜監聽）
 const toggleExpand = async (item) => {
   item.isExpanded = !item.isExpanded
+  await nextTick()
+  if (process.client) {
+    const VanillaTilt = (await import('vanilla-tilt')).default
+    const cards = document.querySelectorAll('.brand-card')
+    VanillaTilt.init(cards)
+  }
+}
+const toggleRightExpand = async (item) => {
+  item.isRightExpanded = !item.isRightExpanded
   await nextTick()
   if (process.client) {
     const VanillaTilt = (await import('vanilla-tilt')).default

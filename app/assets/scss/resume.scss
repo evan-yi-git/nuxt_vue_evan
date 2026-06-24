@@ -81,7 +81,7 @@ $font-mono: monospace;
   @media (min-width: 768px) { width: calc(50% - 2px); padding-left: 0; padding-right: 32px; }
 }
 .item-right-block {
-  width: 100%; padding-right: 32px; margin-top: 0; box-sizing: border-box;
+  width: 100%; padding-right: 12px; margin-top: 0; box-sizing: border-box;
   @media (min-width: 768px) { width: calc(50% - 2px); padding-left: 32px; margin-top: 0; }
   &.final-text-block { @media (min-width: 768px) { margin-top: 6px; } }
 }
@@ -105,9 +105,9 @@ $font-mono: monospace;
   width: 100%;
 }
 .mockup-pc-container { width: 100%; }
-.mockup-pc-card { width: 100%; aspect-ratio: 16 / 10; background-color: #e2e8f0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.mockup-pc-card { width: 100%; aspect-ratio: 16 / 10; aspect-ratio: auto; background-color: #e2e8f0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .mockup-mb-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-.mockup-mb-card { width: 100%; aspect-ratio: 9 / 16; background-color: #e2e8f0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.mockup-mb-card { width: 100%; aspect-ratio: 9 / 16; aspect-ratio: auto; background-color: #e2e8f0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
 .project-img { width: 100%; height: 100%; object-fit: cover; }
 
 .brand-grid {
@@ -209,6 +209,7 @@ $font-mono: monospace;
     box-sizing: border-box;
     cursor: default;
     user-select: none;
+    overflow: hidden;
     
     // 💡 啟用 3D 子層渲染，這會讓裡面的文字產生「懸浮高低差」
     transform-style: preserve-3d;
@@ -261,5 +262,46 @@ $font-mono: monospace;
     &:active {
       transform: translateY(1px);
     }
+  }
+}
+.brand-grid {
+  // --- 📱 手機/行動裝置版預設樣式 ---
+  max-height: 320px; // 精準鎖定前 16 個卡片的高度
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .brand-card.hidden-card {
+    opacity: 0;
+    pointer-events: none;
+    display: none; // 手機版未展開時徹底隱藏
+  }
+
+  // 手機版點擊展開後的狀態
+  &.is-expanded {
+    max-height: 3000px !important; // 給予足夠大的安全高度撐開
+    .brand-card.hidden-card {
+      opacity: 1;
+      pointer-events: auto;
+      display: flex;
+    }
+  }
+
+  // --- 💻 桌機版樣式覆蓋（大於 768px） ---
+  @media (min-width: 768px) {
+    max-height: none !important; // 徹底解除高度限制
+    
+    .brand-card.hidden-card {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      display: flex !important; // 強制讓所有卡片大方秀出來
+    }
+  }
+}
+
+// 展開按鈕的響應式開關
+.expand-btn-wrapper.mobile-only-btn {
+  display: block; // 手機版正常顯示按鈕
+
+  @media (min-width: 768px) {
+    display: none !important; // 💡 電腦版時，按鈕徹底灰飛煙滅，不佔用任何空間
   }
 }
