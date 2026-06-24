@@ -2,7 +2,7 @@
   "compilerOptions": {
     "paths": {
       "nuxt": [
-        "../node_modules/nuxt"
+        "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7__@babel+plugin-syntax-typ_91b2f363233afb9faa9312f2b5a49632/node_modules/nuxt"
       ],
       "@unhead/vue": [
         "../node_modules/@unhead/vue"
@@ -83,25 +83,25 @@
         "../server/*"
       ],
       "#app": [
-        "../node_modules/nuxt/dist/app"
+        "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7__@babel+plugin-syntax-typ_91b2f363233afb9faa9312f2b5a49632/node_modules/nuxt/dist/app"
       ],
       "#app/*": [
-        "../node_modules/nuxt/dist/app/*"
+        "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7__@babel+plugin-syntax-typ_91b2f363233afb9faa9312f2b5a49632/node_modules/nuxt/dist/app/*"
       ],
       "vue-demi": [
-        "../node_modules/nuxt/dist/app/compat/vue-demi"
+        "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7__@babel+plugin-syntax-typ_91b2f363233afb9faa9312f2b5a49632/node_modules/nuxt/dist/app/compat/vue-demi"
       ],
       "#vue-router": [
-        "../node_modules/vue-router"
+        "../node_modules/.pnpm/vue-router@5.1.0_@vue+compiler-sfc@3.5.38_esbuild@0.25.12_rollup@4.62.2_vite@7.3.5_jiti_acb7d85edd9581c897fe885ed4f697bd/node_modules/vue-router"
       ],
       "#unhead/composables": [
-        "../node_modules/nuxt/dist/head/runtime/composables"
+        "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7__@babel+plugin-syntax-typ_91b2f363233afb9faa9312f2b5a49632/node_modules/nuxt/dist/head/runtime/composables"
       ],
       "#imports": [
         "./imports"
       ],
       "#app-manifest": [
-        "./manifest/meta/dev.json"
+        "./manifest/meta/5f67e6a2-d605-4df1-a07f-74e830e3dced.json"
       ],
       "#components": [
         "./components"
@@ -158,8 +158,8 @@
   ],
   "exclude": [
     "../node_modules",
-    "../node_modules/nuxt/node_modules",
-    "../node_modules/vuetify-nuxt-module/node_modules",
+    "../node_modules/.pnpm/nuxt@4.4.8_@babel+plugin-syntax-jsx@7.29.7_@babel+core@7.29.7__@babel+plugin-syntax-typ_91b2f363233afb9faa9312f2b5a49632/node_modules/nuxt/node_modules",
+    "../node_modules/.pnpm/vuetify-nuxt-module@0.19.5_magicast@0.5.3_vite@7.3.5_jiti@2.7.0_sass@1.101.0_terser@5.4_71ed6d1adab19b0d6dcbc5379d55c9bf/node_modules/vuetify-nuxt-module/node_modules",
     "../node_modules/@nuxt/devtools/node_modules",
     "../node_modules/@nuxt/telemetry/node_modules",
     "../dist",
@@ -173,11 +173,15 @@
     "../layers/*/nuxt.config.*",
     "../layers/*/.config/nuxt.*",
     "../layers/*/modules/**/*",
+    "../node_modules/.pnpm/vuetify-nuxt-module@0.19.5_magicast@0.5.3_vite@7.3.5_jiti@2.7.0_sass@1.101.0_terser@5.4_71ed6d1adab19b0d6dcbc5379d55c9bf/node_modules/runtime/server",
+    "../node_modules/.pnpm/vuetify-nuxt-module@0.19.5_magicast@0.5.3_vite@7.3.5_jiti@2.7.0_sass@1.101.0_terser@5.4_71ed6d1adab19b0d6dcbc5379d55c9bf/node_modules/dist/runtime/server",
+    "../node_modules/.pnpm/vuetify-nuxt-module@0.19.5_magicast@0.5.3_vite@7.3.5_jiti@2.7.0_sass@1.101.0_terser@5.4_71ed6d1adab19b0d6dcbc5379d55c9bf/node_modules/*.*",
+    "../node_modules/.pnpm/vuetify-nuxt-module@0.19.5_magicast@0.5.3_vite@7.3.5_jiti@2.7.0_sass@1.101.0_terser@5.4_71ed6d1adab19b0d6dcbc5379d55c9bf/node_modules/dist/*.*",
     "../node_modules/runtime/server",
     "../node_modules/dist/runtime/server",
     "../node_modules/*.*",
     "../node_modules/dist/*.*",
-    "dev",
+    "../.output",
     "../server"
   ],
   "vueCompilerOptions": {

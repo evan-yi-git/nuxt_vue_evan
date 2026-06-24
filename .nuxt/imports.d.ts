@@ -32,4 +32,3 @@ export { setInterval } from '#app/compat/interval';
 export { definePageMeta, PageMeta } from '#app/composables/pages';
 export { defineLazyHydrationComponent } from '#app/composables/lazy-hydration';
 export { useDate, useLocale, useDefaults, useDisplay, useLayout, useRtl, useTheme, useGoTo, useHotkey, useMask } from 'vuetify';
-export { useNuxtDevTools } from '../node_modules/@nuxt/devtools/dist/runtime/use-nuxt-devtools';
