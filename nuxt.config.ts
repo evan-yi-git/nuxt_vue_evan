@@ -1,3 +1,4 @@
+// nuxt.config.ts
 export default defineNuxtConfig({
   devtools: { enabled: true },
   modules: [
@@ -14,5 +15,15 @@ export default defineNuxtConfig({
       ssr: true
     }
   },
+
+  vite: {
+    optimizeDeps: {
+      include: [
+        '@vue/devtools-core',
+        '@vue/devtools-kit'
+      ]
+    }
+  },
+
   compatibilityDate: '2026-06-16'
 })
