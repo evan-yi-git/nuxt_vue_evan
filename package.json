@@ -18,6 +18,7 @@
     "vuetify-nuxt-module": "^0.19.5"
   },
   "devDependencies": {
-    "sass": "^1.101.0"
+    "nuxt": "^4.4.8",
+    "sass": "^1.80.0" 
   }
 }
