@@ -1,0 +1,23 @@
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
+
+# Node dependencies
+node_modules
+
+# Logs
+logs
+*.log
+
+# macOS 系統產生的垃圾隱藏檔
+.DS_Store
+._*
+.AppleDouble
+
+# Local env files
+.env
+.env.*
