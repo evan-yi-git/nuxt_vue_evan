@@ -93,7 +93,7 @@
           <div v-if="item.images && item.images.length" class="project-images-wrapper pt-12">
             <div v-if="item.imageType === 'pc'" class="mockup-pc-container">
               <div class="mockup-pc-card shadow-lg border border-slate-200 rounded">
-                <img :src="item.images" :alt="item.title" class="project-img object-cover w-full h-full" />
+                <img :src="item.images[0]" :alt="item.title" class="project-img object-cover w-full h-full" />
               </div>
             </div>
             <div v-if="item.imageType === 'mb'" class="mockup-mb-grid">
