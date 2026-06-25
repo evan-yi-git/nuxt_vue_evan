@@ -25,5 +25,21 @@ export default defineNuxtConfig({
     }
   },
 
-  compatibilityDate: '2026-06-16'
+  compatibilityDate: '2026-06-16',
+  
+  app: {
+    head: {
+      script: [
+        { 
+          src: 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js', 
+          defer: true 
+        },
+        { 
+          src: 'https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js', 
+          defer: true 
+        }
+      ]
+    }
+  }
+
 })

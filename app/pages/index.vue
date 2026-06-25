@@ -18,7 +18,10 @@
     </header>
 
     <main class="timeline-main">
-      <div class="timeline-axis"></div>
+      <div class="timeline-axis">
+        <div class="timeline-axis-bg"></div>
+        <div class="timeline-axis-fill"></div>
+      </div>
 
       <div v-for="(item, index) in timelineData" :key="index" class="timeline-item">
         
@@ -322,6 +325,9 @@ const toggleExpand = async (item) => {
     const cards = document.querySelectorAll('.brand-card')
     VanillaTilt.init(cards)
   }
+  if (typeof ScrollTrigger !== 'undefined') {
+    ScrollTrigger.refresh()
+  }
 }
 const toggleRightExpand = async (item) => {
   item.isRightExpanded = !item.isRightExpanded
@@ -331,15 +337,70 @@ const toggleRightExpand = async (item) => {
     const cards = document.querySelectorAll('.brand-card')
     VanillaTilt.init(cards)
   }
+  if (typeof ScrollTrigger !== 'undefined') {
+      ScrollTrigger.refresh()
+    }
 }
 
-// 掛載全域 3D 視差監聽
 onMounted(async () => {
+  await nextTick()
+
   if (process.client) {
     const VanillaTilt = (await import('vanilla-tilt')).default
     const cards = document.querySelectorAll('.brand-card')
     VanillaTilt.init(cards)
   }
-})
-</script>
 
+  if (process.client) {
+    const initGsapAnimation = () => {
+      if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger)
+    
+        gsap.config({ force3D: true })
+        
+        gsap.fromTo('.timeline-axis-fill', 
+          { 
+            scaleY: 0,
+            xPercent: -50 
+          },
+          {
+            scaleY: 1,
+            xPercent: -50,
+            ease: 'none', 
+            scrollTrigger: {
+              trigger: '.timeline-main',
+              start: 'top top',       
+              end: 'bottom bottom',
+              scrub: true,
+              invalidateOnRefresh: true,
+              markers: false,
+              
+              // 💡 核心新增：監聽滾動進度
+              onUpdate: (self) => {
+                // 取得外層大外殼的 DOM 元素 (.timeline-axis)
+                const axisElement = document.querySelector('.timeline-axis')
+                if (!axisElement) return
+        
+                // self.progress 的數值介於 0 ~ 1 之間
+                // 當 progress === 1 代表百分之百觸底了！
+                if (self.progress >= 0.99) { 
+                  axisElement.classList.add('is-bottom') // 觸底時加上 class
+                } else {
+                  axisElement.classList.remove('is-bottom') // 往上滾動時自動移除 class
+                }
+              }
+            }
+          }
+        )
+
+        console.log('GSAP 與 ScrollTrigger 順利載入並初始化成功！')
+      } else {
+        setTimeout(initGsapAnimation, 50)
+      }
+    }
+
+    initGsapAnimation()
+  }
+})
+
+</script>

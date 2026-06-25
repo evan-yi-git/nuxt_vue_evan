@@ -2,6 +2,8 @@ $bg-color: #f4f4f4;
 $text-dark: #333333;
 $text-muted: #64748b;
 $border-color: #555555;
+$border-color2: #5a9cda;
+$border-linear: linear-gradient(to bottom, transparent, #5a9cda);
 $font-mono: monospace;
 
 .resume-wrapper {
@@ -63,13 +65,40 @@ $font-mono: monospace;
   max-width: 1152px; margin: 0 auto; padding: 0 16px; position: relative; box-sizing: border-box;
 
   .timeline-axis {
-    position: absolute; left: auto; right: 14px; top: -90px; bottom: -35px; width: 2px; background-color: $border-color; transform: translateX(-50%); z-index: 0;
-    @media (min-width: 768px) { left: 50%; }
+    position: absolute; left: auto; right: 14px; top: -90px; bottom: -35px; width: 2px; transform: translateX(-50%); z-index: 0;
+    // background-color: $border-color;
+    @media (min-width: 768px) { left: 50%; right: auto;}
     &::after {
       content: ""; position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%);
       border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 11px solid $border-color;
     }
+    &.is-bottom{
+      &::after {
+        border-top: 11px solid $border-color2;
+      }
+    }
+
+    &-bg {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background-color: $border-color;
+      // opacity: 0.3; 
+    }
+
+    &-fill {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 1px;
+      width: 100%;
+      background: $border-linear;
+      transform-origin: top center;
+    }
   }
+
   .timeline-item {
     position: relative; z-index: 1; display: flex; flex-direction: column; margin-bottom: 20px;
     @media (min-width: 768px) { flex-direction: row; justify-content: space-between; margin-bottom: 80px;}

@@ -2097,7 +2097,7 @@ const _Q0aHVhJiDnO2spKv9aouAMewom_NQWdQEJId2w3XPuY = (function(nitro) {
 
 const rootDir = "/Volumes/檔案/nuxt_vue_evan";
 
-const appHead = {"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"}],"link":[],"style":[],"script":[],"noscript":[]};
+const appHead = {"meta":[{"name":"viewport","content":"width=device-width, initial-scale=1"},{"charset":"utf-8"}],"link":[],"style":[],"script":[{"src":"https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js","defer":true},{"src":"https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js","defer":true}],"noscript":[]};
 
 const appRootTag = "div";
 
