@@ -14,7 +14,7 @@
     <v-main>
       <v-container fluid class="pa-0">
         <!-- 確保讀取 public/image/mb.jpg，並且寬度永遠填滿螢幕 -->
-        <v-img src="/image/mb.jpg" class="w-100" cover min-height="100vh"></v-img>
+        <!-- <v-img src="/image/mb.jpg" class="w-100" cover min-height="100vh"></v-img> -->
       </v-container>
     </v-main>
   </v-app>
