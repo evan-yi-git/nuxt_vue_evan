@@ -298,35 +298,30 @@ $font-mono: monospace;
   }
 }
 .brand-grid {
-  // --- 📱 手機/行動裝置版預設樣式 ---
-  max-height: 320px; // 精準鎖定前 16 個卡片的高度
-  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  display: grid; // 您原本的 grid 設定
+  
+  // 💡 絲滑核心 1：預設收合狀態下的最大限制高度（請根據您原本 16 張卡片的高度微調，例如 320px）
+  max-height: 320px; 
+  overflow: hidden;   // 💡 超過限制高度的卡片先藏起來
+  
+  // 💡 絲滑核心 2：為最大高度與透明度加上滑順的轉場動畫（時間 0.5 秒）
+  transition: max-height 0.5s ease-in-out, opacity 0.3s ease;
+  will-change: max-height; // 釋放瀏覽器硬體加速
 
-  .brand-card.hidden-card {
-    opacity: 0;
-    pointer-events: none;
-    display: none; // 手機版未展開時徹底隱藏
-  }
-
-  // 手機版點擊展開後的狀態
+  // 💡 當點擊按鈕，Vue 幫外層注入 .is-expanded 類別時
   &.is-expanded {
-    max-height: 3000px !important; // 給予足夠大的安全高度撐開
-    .brand-card.hidden-card {
-      opacity: 1;
-      pointer-events: auto;
-      display: flex;
-    }
+    // 💡 絲滑核心 3：將最大高度放寬到一個絕對夠裝所有卡片的大數值（例如 2000px）
+    // 瀏覽器就會根據這個範圍，花 0.5 秒的時間滑順地把網頁往下推開，不再跳動！
+    max-height: 2000px; 
   }
-
-  // --- 💻 桌機版樣式覆蓋（大於 768px） ---
-  @media (min-width: 768px) {
-    max-height: none !important; // 徹底解除高度限制
-    
-    .brand-card.hidden-card {
-      opacity: 1 !important;
-      pointer-events: auto !important;
-      display: flex !important; // 強制讓所有卡片大方秀出來
-    }
+  
+  // 💡 隱藏卡片的初始淡入效果（可自由搭配）
+  .hidden-card {
+    opacity: 0.3;
+    transition: opacity 0.4s ease;
+  }
+  &.is-expanded .hidden-card {
+    opacity: 1;
   }
 }
 

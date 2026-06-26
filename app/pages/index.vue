@@ -329,31 +329,46 @@ const timelineData = reactive([
   }
 ])
 
-// 點擊展開事件（並重新初始化視差傾斜監聽）
+// 點擊展開事件（並重新初始化視差傾斜監聽與滑動高度同步）
 const toggleExpand = async (item) => {
   item.isExpanded = !item.isExpanded
   await nextTick()
+  
   if (process.client) {
     const VanillaTilt = (await import('vanilla-tilt')).default
     const cards = document.querySelectorAll('.brand-card')
     VanillaTilt.init(cards)
   }
-  if (typeof ScrollTrigger !== 'undefined') {
-    ScrollTrigger.refresh()
-  }
+
+  // ✨ 核心修正：等待 400ms（留給 CSS 展開動畫走完的時間），確保網頁長度定型
+  setTimeout(() => {
+    if (typeof ScrollTrigger !== 'undefined') {
+      // 🚀 叫醒全網頁：重新計算所有文字、年份、成果圖片與 Footer 的精準觸發高度！
+      ScrollTrigger.refresh()
+      console.log('🔄 品牌牆展開：全網頁圖片與時間軸滑動高度已同步重新校準！')
+    }
+  }, 400)
 }
+
 const toggleRightExpand = async (item) => {
   item.isRightExpanded = !item.isRightExpanded
   await nextTick()
+  
   if (process.client) {
     const VanillaTilt = (await import('vanilla-tilt')).default
     const cards = document.querySelectorAll('.brand-card')
     VanillaTilt.init(cards)
   }
-  if (typeof ScrollTrigger !== 'undefined') {
+
+  // ✨ 核心修正：右側展開也同步加入 400ms 延遲校準
+  setTimeout(() => {
+    if (typeof ScrollTrigger !== 'undefined') {
       ScrollTrigger.refresh()
+      console.log('🔄 右側品牌牆展開：全網頁滑動高度已同步重新校準！')
     }
+  }, 400)
 }
+
 
 onMounted(async () => {
   await nextTick()
@@ -501,9 +516,7 @@ onMounted(async () => {
           }
         })
     
-        // ==========================================
-        // 💡 D. 全新增加：成果圖片獨立滑動判定動畫 (全面兼容電腦與手機版)
-        // ==========================================
+        // D. 全新增加：成果圖片獨立滑動判定動畫 (全面兼容電腦與手機版)
         // 同步抓取專案成果圖的所有 PC 卡片與 Mobile 卡片外殼
         const projectCards = gsap.utils.toArray('.mockup-pc-card, .mockup-mb-card')
         
@@ -531,31 +544,29 @@ onMounted(async () => {
           )
         })
         
-    // ==========================================
-    // 💡 E. 全新優化：Footer 溫馨謝幕浮現動畫（極致流暢版）
-    // ==========================================
-    const footerText = document.querySelector('.resume-footer .thank-you-text')
-    
-    if (footerText) {
-      gsap.fromTo(footerText,
-        {
-          opacity: 0,
-          y: 35 // 從下方 35px 緩緩爬升
-        },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 1.2, // 1.2 秒穩定登場
-          ease: 'power2.out', // 換成最流暢的二次方減速曲線
-          scrollTrigger: {
-            trigger: '.resume-footer',
-            start: 'top 95%', // 一露頭就開始滑順登場
-            toggleActions: 'play reverse play reverse',
-            invalidateOnRefresh: true
-          }
+        // E. 全新優化：Footer 溫馨謝幕浮現動畫（極致流暢版）
+        const footerText = document.querySelector('.resume-footer .thank-you-text')
+        
+        if (footerText) {
+          gsap.fromTo(footerText,
+            {
+              opacity: 0,
+              y: 35 // 從下方 35px 緩緩爬升
+            },
+            {
+              opacity: 1,
+              y: 0,
+              duration: 1.2, // 1.2 秒穩定登場
+              ease: 'power2.out', // 換成最流暢的二次方減速曲線
+              scrollTrigger: {
+                trigger: '.resume-footer',
+                start: 'top 95%', // 一露頭就開始滑順登場
+                toggleActions: 'play reverse play reverse',
+                invalidateOnRefresh: true
+              }
+            }
+          )
         }
-      )
-    }
 
         console.log('GSAP 與 ScrollTrigger 順利載入並初始化成功！')
       } else {
