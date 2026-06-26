@@ -26,6 +26,7 @@ $font-mono: monospace;
     align-items: center; 
     justify-content: space-between; 
     gap: 8px; // 縮小手機版間距
+    perspective: 1000px; // 💡 注入 3D 核心透視眼，讓大頭貼翻轉和文字飛入更有立體感
 
     @media (min-width: 768px) {
       flex-direction: row;
@@ -45,7 +46,10 @@ $font-mono: monospace;
   .header-right {
     text-align: left;
   }
-
+  
+  .header-left, .avatar-box, .header-right,.mobile-intro-header, .desktop-intro-header {
+    will-change: transform, opacity;
+  }
   // 💡 手機版文字精細縮小，避免在窄螢幕上斷行
   .name { font-size: 20px; font-weight: 700; color: #111827; margin: 0 0 2px 0; letter-spacing: 1px; @media (min-width: 768px) { font-size: 32px; letter-spacing: 2px; } }
   .nickname { font-size: 11px; color: $text-muted; margin: 0; @media (min-width: 768px) { font-size: 14px; letter-spacing: 1px; } }
@@ -72,11 +76,11 @@ $font-mono: monospace;
       content: ""; position: absolute; left: 50%; bottom: -10px; transform: translateX(-50%);
       border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 11px solid $border-color;
     }
-    &.is-bottom{
-      &::after {
-        border-top: 11px solid $border-color2;
-      }
-    }
+    // &.is-bottom{
+    //   &::after {
+    //     border-top: 11px solid $border-color2;
+    //   }
+    // }
 
     &-bg {
       position: absolute;
@@ -125,7 +129,7 @@ $font-mono: monospace;
       content: ""; position: absolute; right: -34px; bottom: -2px; width: 34px; height: 2px; background-color: $border-color;
     }
   }
-  .date-year { font-family: Georgia, Cambria, serif; font-size: 32px; font-weight: 700; color: #111827; }
+  .date-year { font-family: Georgia, Cambria, serif; font-size: 32px; font-weight: 700; color: #111827; white-space: nowrap;}
   .date-tech { font-size: 10px; font-family: $font-mono; color: $text-muted; font-weight: 600; margin-top: 4px; @media (min-width: 576px) { margin-top: 0; } }
 }
 
@@ -345,5 +349,78 @@ $font-mono: monospace;
     display: inline-block;
     white-space: pre; // 💡 防止空格或特殊符號在拆解時塌陷
     will-change: transform, opacity; // 💡 開啟瀏覽器硬體加速
+  }
+}
+
+
+// 💡 先在 SCSS 最外層定義一個專屬的「極致自發光呼吸動畫」
+// 🔥 升級版：5px 超清晰邊緣隔離帶 + 藍色光暈呼吸動畫
+@keyframes glowBreath {
+  0% {
+    text-shadow: 
+      // 💡 核心魔術：將前幾層全部定死在 5px #ffffff，徹底把藍光推到 5px 開外！
+      0 0 5px #ffffff, 
+      0 0 5px #ffffff,
+      0 0 5px #ffffff,
+      // 3 層之後才是真正的藍光，一開始淡淡的
+      0 0 15px rgba(90, 156, 218, 0.35),
+      0 0 25px rgba(90, 156, 218, 0.15);
+  }
+  50% {
+    text-shadow: 
+      // 💡 呼吸到最亮時，疊加更多層 5px 白光，死死捍衛這 5px 的乾淨真空帶
+      0 0 5px #ffffff, 
+      0 0 5px #ffffff,
+      0 0 5px #ffffff,
+      0 0 5px #ffffff,
+      // 外圍藍色霓虹燈全面爆發、更大範圍地在 5px 之外擴散！
+      0 0 20px rgba(90, 156, 218, 0.85),
+      0 0 35px rgba(90, 156, 218, 0.55),
+      0 0 55px rgba(90, 156, 218, 0.25);
+  }
+  100% {
+    text-shadow: 
+      0 0 5px #ffffff, 
+      0 0 5px #ffffff,
+      0 0 5px #ffffff,
+      0 0 15px rgba(90, 156, 218, 0.35),
+      0 0 25px rgba(90, 156, 218, 0.15);
+  }
+}
+
+
+.resume-footer {
+  padding: 80px 0; // 稍微加大底部留白，讓呼吸光有足夠的展現空間
+  text-align: center;
+  overflow: hidden;
+
+  .thank-you-text {
+    font-size: 1.15rem; // 稍微放大一絲絲，讓光暈更寬廣
+    font-weight: 500;   // 稍微帶點粗度，發光效果會更加飽滿明顯
+    letter-spacing: 0px;
+    
+    // 💡 核心優化：只留下純 CSS 負責的字距轉場，絕對不寫 transform 避免與 GSAP 打架！
+    transition: letter-spacing 1.5s ease-out, color 0.6s ease;
+    will-change: opacity, transform;
+  }
+}
+
+// ==========================================
+// 🔥 終極連動：當最外層觸底點亮時 (.is-bottom 啟動)
+// ==========================================
+.resume-wrapper.is-bottom {
+  
+  // 1. 點亮時間軸最底部的倒三角形箭頭
+  .timeline-axis::after {
+    border-top-color: #5a9cda !important;
+  }
+
+  // 2. 解鎖 Footer：字距拉開 + 啟動動態自發光呼吸！
+  .resume-footer .thank-you-text {
+    // color: #5a9cda !important; // 完美鍍上主題藍
+    letter-spacing: 2px;       // 字距優雅散開
+
+    // 💡 核心進化：強制綁定全域呼吸動畫，無限循環 (infinite)，每次呼吸花 3 秒 (3s)
+    animation: glowBreath 3s infinite ease-in-out;
   }
 }

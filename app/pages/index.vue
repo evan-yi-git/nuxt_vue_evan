@@ -370,7 +370,61 @@ onMounted(async () => {
         gsap.registerPlugin(ScrollTrigger)
     
         gsap.config({ force3D: true })
-        
+
+        // 建立一個獨立的網頁載入時間軸 (Timeline)
+        const headerTimeline = gsap.timeline({ delay: 0.2 }) // 💡 載入後先優雅地等 0.2 秒再開演
+        headerTimeline 
+          // 1. 大頭貼率先登場：從小變大 + 3D 翻轉旋轉
+          .fromTo('.resume-header .avatar-box',
+            {
+              opacity: 1,
+              scale: 1,
+              rotationY: -92, // 從背面 3D 翻轉過來
+              // z: -200          // 從空間深處飛向前
+            },
+            {
+              opacity: 1,
+              scale: 1,
+              rotationY: 0,
+              z: 0,
+              duration: 1.2,
+              ease: 'back.out(1.5)' // 💡 帶有微微橡皮筋回彈的高級動態曲線
+            }
+          )
+          // 2. 左側姓名區塊登場：從左側 -50px 處滑入，並在頭像動畫跑到一半時 (小於符號 '<' 後移 0.6 秒) 提早切入
+          .fromTo('.resume-header .header-left',
+            {
+              opacity: 0,
+              x: -50,
+              skewX: -10 // 帶有一點點速度感的向右傾斜
+            },
+            {
+              opacity: 1,
+              x: 0,
+              skewX: 0,
+              duration: 0.8,
+              ease: 'power3.out'
+            },
+            '<=0.6' 
+          )
+          // 3. 右側職稱區塊登場：從右側 50px 處滑入，與左側文字同步交錯切入
+          .fromTo('.resume-header .header-right',
+            {
+              opacity: 0,
+              x: 50,
+              skewX: 10 // 帶有一點點速度感的向左傾斜
+            },
+            {
+              opacity: 1,
+              x: 0,
+              skewX: 0,
+              duration: 0.8,
+              ease: 'power3.out'
+            },
+            '<' // 💡 無縫對齊左側文字的啟動時間，兩側同時向中間靠攏
+          )
+
+          // 中軸線
         gsap.fromTo('.timeline-axis-fill', 
           { 
             scaleY: 0,
@@ -390,102 +444,119 @@ onMounted(async () => {
               
               // 💡 核心新增：監聽滾動進度
               onUpdate: (self) => {
-                // 取得外層大外殼的 DOM 元素 (.timeline-axis)
-                const axisElement = document.querySelector('.timeline-axis')
-                if (!axisElement) return
-        
-                // self.progress 的數值介於 0 ~ 1 之間
-                // 當 progress === 1 代表百分之百觸底了！
+                // 💡 核心修正：改為抓取專案最外層的大外殼容器
+                const wrapperElement = document.querySelector('.resume-wrapper')
+                if (!wrapperElement) return
+                
+                // 當進度完全觸底 (100%) 時
                 if (self.progress >= 0.99) { 
-                  axisElement.classList.add('is-bottom') // 觸底時加上 class
+                  wrapperElement.classList.add('is-bottom') // 全域解鎖亮燈
                 } else {
-                  axisElement.classList.remove('is-bottom') // 往上滾動時自動移除 class
+                  wrapperElement.classList.remove('is-bottom')
                 }
               }
             }
           }
         )
-        
-        // 🔥 智慧分流：首項（自動跑 + 返回重播）+ 後續（完全沿用您的滾輪咬合程式碼）
-        gsap.utils.toArray('.timeline-item').forEach((item, index) => {
-          // 抓取當前項目底下的所有單字元 span
+        const timelineItems = gsap.utils.toArray('.timeline-item')
+        timelineItems.forEach((item, index) => {
           const chars = item.querySelectorAll('.char-item')
-          if (!chars.length) return
-        
-          // 💡 情況 A：如果是最頂端的第一個項目 (index === 0)
+          const mobileHeader = item.querySelector('.mobile-intro-header')
+          const desktopHeader = item.querySelector('.desktop-intro-header')
+          const mobileContent = item.querySelector('.mobile-only-content')
+          const desktopContent = item.querySelector('.desktop-only-content')
+          
+          // 💡 圖片從這裡抽離！textGroup 現在只純粹控制文字內容
+          const textGroup = [mobileHeader, desktopHeader, mobileContent, desktopContent].filter(Boolean)
+          const isLastItem = index === timelineItems.length - 1
+          const isSecondToLastItem = index === timelineItems.length - 2
+    
           if (index === 0) {
-            gsap.fromTo(chars,
-              {
-                opacity: 0,       
-                y: 40,            
-                scale: 0.5,       
-                rotationX: -45,   
-              },
-              {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                rotationX: 0,
-                ease: 'power2.out', 
-                duration: 0.6,      
-                stagger: 0.15,      
-                
-                scrollTrigger: {
-                  trigger: item,
-                  start: 'top 95%',  // 💡 當這個區塊有 5% 進入畫面（幾乎一到頂）就觸發
-                  
-                  // ✨ 關鍵魔術：
-                  // play (第一次進入播放) / none (離開時不做事) / restart (返回時重新播放) / none (往回離開不做事)
-                  toggleActions: 'play none restart none', 
-                  
-                  // ❌ 注意：這裡「不要」加 scrub: 1，這樣它返回時才會是用固定時間「帥氣飛入跑一次」，而不是死咬滾輪
-                  invalidateOnRefresh: true,
-                  markers: false
-                }
+            const tl = gsap.timeline({
+              scrollTrigger: {
+                trigger: item, start: 'top 95%', toggleActions: 'play none restart none', invalidateOnRefresh: true
               }
-            )
-          } 
-          // 💡 情況 B：其餘項目，100% 完全套用您提供的原始程式碼與滾輪咬合設定
-          else {
-            gsap.fromTo(chars,
-              {
-                opacity: 0,       // 一開始完全隱形
-                y: 40,            // 從下方 40px 的地方（改從下方往上飛，滑動感更強）
-                scale: 0.5,       // 一開始縮小到 50%
-                rotationX: -45,   // 帶有 3D 翻轉的俯視角度
-              },
-              {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                rotationX: 0,
-                ease: 'power2.out', // 💡 改用滑順平緩的非線性曲線
-                
-                scrollTrigger: {
-                  trigger: item,       // 以該時間軸區塊為偵測目標
-                  
-                  // 💡 調整觸發區間：
-                  // 當區塊頂部到達螢幕下方 75% 時開始飛入第一個字
-                  // 當區塊頂部到達螢幕中間 60% 時，全部的字剛好完美飛完
-                  start: 'top 75%',    
-                  end: 'top 60%',      
-                  
-                  // 🚀 核心流暢優化：將 scrub 改為 1（代表 1 秒的平滑跟隨延遲）
-                  // 這會讓滑動時文字產生像「拉果凍」一樣滑順、高級的逐字浮現感
-                  scrub: 1,            
-                  
-                  invalidateOnRefresh: true,
-                  markers: false             
-                },
-                
-                // 🚀 核心靈魂：拉大交錯時間差（從 0.04 放大到 0.2）
-                // 這會拉開字與字之間的動畫順序，讓「逐字飛入」的獨立感非常清晰
-                stagger: 0.2 
+            })
+            if (chars.length) {
+              tl.fromTo(chars,
+                { opacity: 0, y: 40, scale: 0.5, rotationX: -45 },
+                { opacity: 1, y: 0, scale: 1, rotationX: 0, ease: 'power2.out', duration: 0.6, stagger: 0.15 }
+              )
+            }
+            tl.fromTo(textGroup, { opacity: 0, y: 55 }, { opacity: 1, y: 0, duration: 1.6, ease: 'power2.out' }, '<=0.3')
+          } else {
+            const endPosition = (isLastItem || isSecondToLastItem) ? 'bottom bottom' : 'top 5%'
+            const tl = gsap.timeline({
+              scrollTrigger: {
+                trigger: item, start: 'top 85%', end: endPosition, scrub: 2.0, invalidateOnRefresh: true
               }
-            )
+            })
+            if (chars.length) {
+              tl.fromTo(chars,
+                { opacity: 0, y: 40, scale: 0.5, rotationX: -45 },
+                { opacity: 1, y: 0, scale: 1, rotationX: 0, ease: 'power2.out', stagger: 0.2 }
+              )
+            }
+            tl.fromTo(textGroup, { opacity: 0, y: 55 }, { opacity: 1, y: 0, ease: 'power2.out' }, '<=0.2')
           }
         })
+    
+        // ==========================================
+        // 💡 D. 全新增加：成果圖片獨立滑動判定動畫 (全面兼容電腦與手機版)
+        // ==========================================
+        // 同步抓取專案成果圖的所有 PC 卡片與 Mobile 卡片外殼
+        const projectCards = gsap.utils.toArray('.mockup-pc-card, .mockup-mb-card')
         
+        projectCards.forEach((card) => {
+          gsap.fromTo(card,
+            {
+              opacity: 0,
+              y: 60,           // 圖片從下方 60px 處徐徐升起
+              scale: 0.95      // 帶有一點點微微放大的聚焦感
+            },
+            {
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              duration: 1.0,   // 動畫時間 1 秒，非常沉穩優雅
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: card,      // 💡 關鍵：以「圖片自己」作為滾動觸發目標
+                start: 'top 88%',   // 當圖片頂部進入螢幕下方 12% (即 88% 處) 時立刻被點亮
+                // toggleActions: 'play none none none', // 滾過就固定亮起，確保看作品時體驗最安定
+                toggleActions: 'play reverse play reverse', 
+                invalidateOnRefresh: true
+              }
+            }
+          )
+        })
+        
+    // ==========================================
+    // 💡 E. 全新優化：Footer 溫馨謝幕浮現動畫（極致流暢版）
+    // ==========================================
+    const footerText = document.querySelector('.resume-footer .thank-you-text')
+    
+    if (footerText) {
+      gsap.fromTo(footerText,
+        {
+          opacity: 0,
+          y: 35 // 從下方 35px 緩緩爬升
+        },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1.2, // 1.2 秒穩定登場
+          ease: 'power2.out', // 換成最流暢的二次方減速曲線
+          scrollTrigger: {
+            trigger: '.resume-footer',
+            start: 'top 95%', // 一露頭就開始滑順登場
+            toggleActions: 'play reverse play reverse',
+            invalidateOnRefresh: true
+          }
+        }
+      )
+    }
+
         console.log('GSAP 與 ScrollTrigger 順利載入並初始化成功！')
       } else {
         setTimeout(initGsapAnimation, 50)
