@@ -10,13 +10,14 @@ $font-mono: monospace;
   min-height: 100vh; background-color: $bg-color; color: $text-dark;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding-bottom: 80px; box-sizing: border-box;
+  background: url('img/top_banner_bg.jpg') no-repeat top right / 100%;
 }
 
 .resume-header {
-  width: 100%; background-color: transparent; padding: 32px 22px;
-  box-shadow: none; box-sizing: border-box; position: relative; z-index: 1;
+  width: 100%; background: transparent; padding: 32px 22px;
+  box-shadow: none; box-sizing: border-box; position: relative; z-index: 2;
   @media (min-width: 768px) {
-    padding: 32px 12px 0 12px;
+    padding: 32px 12px 50 12px;
   }
 
   .header-container {
@@ -69,7 +70,7 @@ $font-mono: monospace;
   max-width: 1152px; margin: 0 auto; padding: 0 16px; position: relative; box-sizing: border-box;
 
   .timeline-axis {
-    position: absolute; left: auto; right: 14px; top: -90px; bottom: -35px; width: 2px; transform: translateX(-50%); z-index: 0;
+    position: absolute; left: auto; right: 14px; top: -40px; bottom: -35px; width: 2px; transform: translateX(-50%); z-index: 1;
     // background-color: $border-color;
     @media (min-width: 768px) { left: 50%; right: auto;}
     &::after {
@@ -201,69 +202,32 @@ $font-mono: monospace;
 }
 
 .brand-grid {
-  display: grid;
-  gap: 8px;
-  width: 100%;
-  overflow: hidden;
-  // 💡 核心：控制高度展開時的平滑動態過渡
-  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  transform-style: preserve-3d;
-  perspective: 1000px; // 開啟 3D 視差立體景深
+  display: grid; // 您原本的 grid 設定
 
-  // 預設未展開時，隱藏第 16 個之後的卡片
-  .brand-card.hidden-card {
-    opacity: 0;
-    pointer-events: none;
-    transform: scale(0.9) translateZ(-20px);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-  }
+  // 📱 ==========================================
+  // 1. 手機版專屬樣式 (小於 767px 才會折疊)
+  // ==========================================
+  @media (max-width: 767px) {
+    max-height: 320px; // 手機版限制高度
+    overflow: hidden;   // 藏起超過的卡片
+    transition: max-height 0.5s ease-in-out; // 手機版滑開轉場
+    will-change: max-height;
 
-  &.is-expanded {
-    .brand-card.hidden-card {
-      opacity: 1;
-      pointer-events: auto;
-      transform: scale(1) translateZ(0);
+    // 手機版被點擊展開時才拉長
+    &.is-expanded {
+      max-height: 2000px; 
     }
   }
 
-  // 💡 3D 卡片基礎美學設定
-  .brand-card {
-    background-color: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 4px;
-    height: 68px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
-    text-decoration: none;
-    box-sizing: border-box;
-    cursor: default;
-    user-select: none;
-    overflow: hidden;
-    
-    // 💡 啟用 3D 子層渲染，這會讓裡面的文字產生「懸浮高低差」
-    transform-style: preserve-3d;
-    transition: box-shadow 0.2s ease, border-color 0.2s ease;
-
-    &:hover {
-      border-color: #cbd5e1;
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08) !important;
-    }
-
-    // 內層包裹：強制將字體往前推
-    .tilt-inner {
-      transform: translateZ(24px); // 文字往前浮空 24px，3D感極強！
-      width: 100%;
-      padding: 4px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-    }
+  // 💻 ==========================================
+  // 2. 電腦版專屬樣式 (大於 768px 直接全開)
+  // ==========================================
+  @media (min-width: 768px) {
+    max-height: none !important; // 💡 強制解除高度限制，直接全部顯示
+    overflow: visible !important;
   }
 }
+
 
 // 💡 現代化極簡展開按鈕設計
 .expand-btn-wrapper {
@@ -295,33 +259,6 @@ $font-mono: monospace;
     &:active {
       transform: translateY(1px);
     }
-  }
-}
-.brand-grid {
-  display: grid; // 您原本的 grid 設定
-  
-  // 💡 絲滑核心 1：預設收合狀態下的最大限制高度（請根據您原本 16 張卡片的高度微調，例如 320px）
-  max-height: 320px; 
-  overflow: hidden;   // 💡 超過限制高度的卡片先藏起來
-  
-  // 💡 絲滑核心 2：為最大高度與透明度加上滑順的轉場動畫（時間 0.5 秒）
-  transition: max-height 0.5s ease-in-out, opacity 0.3s ease;
-  will-change: max-height; // 釋放瀏覽器硬體加速
-
-  // 💡 當點擊按鈕，Vue 幫外層注入 .is-expanded 類別時
-  &.is-expanded {
-    // 💡 絲滑核心 3：將最大高度放寬到一個絕對夠裝所有卡片的大數值（例如 2000px）
-    // 瀏覽器就會根據這個範圍，花 0.5 秒的時間滑順地把網頁往下推開，不再跳動！
-    max-height: 2000px; 
-  }
-  
-  // 💡 隱藏卡片的初始淡入效果（可自由搭配）
-  .hidden-card {
-    opacity: 0.3;
-    transition: opacity 0.4s ease;
-  }
-  &.is-expanded .hidden-card {
-    opacity: 1;
   }
 }
 
