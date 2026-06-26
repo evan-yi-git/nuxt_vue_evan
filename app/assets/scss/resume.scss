@@ -130,7 +130,7 @@ $font-mono: monospace;
       content: ""; position: absolute; right: -34px; bottom: -2px; width: 34px; height: 2px; background-color: $border-color;
     }
   }
-  .date-year { font-family: Georgia, Cambria, serif; font-size: 32px; font-weight: 700; color: #111827; white-space: nowrap;}
+  .date-year { font-family: Georgia, Cambria, serif; font-size: 32px; font-weight: 700; color: #111827;}
   .date-tech { font-size: 10px; font-family: $font-mono; color: $text-muted; font-weight: 600; margin-top: 4px; @media (min-width: 576px) { margin-top: 0; } }
 }
 
@@ -149,10 +149,10 @@ $font-mono: monospace;
   &.grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   &.grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   &.grid-4 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     padding-top: 12px;
     @media (min-width: 576px) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    @media (min-width: 768px) { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    @media (min-width: 768px) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     @media (min-width: 992px) { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   }
   .brand-card {
@@ -161,7 +161,7 @@ $font-mono: monospace;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04); box-sizing: border-box;
     &.span-3 { grid-column: span 3 / span 3; }
     &.border-none { border: none !important; }
-    &.bg-transparent { background-color: transparent !important; box-shadow: none !important; }
+    &.bg-transparent { box-shadow: none !important; }
   }
   .brand-main { font-size: 11px; font-weight: 700; line-height: 1.2; color: #222222; }
   .brand-sub { font-size: 8px; color: $text-muted; margin-top: 2px; transform: scale(0.85); }
@@ -208,7 +208,7 @@ $font-mono: monospace;
   // 1. 手機版專屬樣式 (小於 767px 才會折疊)
   // ==========================================
   @media (max-width: 767px) {
-    max-height: 320px; // 手機版限制高度
+    max-height: 180px; // 手機版限制高度
     overflow: hidden;   // 藏起超過的卡片
     transition: max-height 0.5s ease-in-out; // 手機版滑開轉場
     will-change: max-height;
@@ -275,12 +275,14 @@ $font-mono: monospace;
 // 逐字飛入
 .date-year {
   display: inline-block;
-  
+  white-space: nowrap !important; 
   // ✨ 逐字飛入的單個字元樣式
   .char-item {
     display: inline-block;
     white-space: pre; // 💡 防止空格或特殊符號在拆解時塌陷
     will-change: transform, opacity; // 💡 開啟瀏覽器硬體加速
+    margin: 0; 
+    padding: 0;
   }
 }
 

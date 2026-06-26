@@ -104,12 +104,33 @@
           </div>
 
           <p v-if="item.content" class="intro-content desktop-only-content">{{ item.content }}</p>
+          
+          <!-- 右側專屬的「雙排跨界合作品牌牆」 -->
+          <div v-if="item.rightBrands && item.rightBrands.length && item.brandPosition !== 'top'" class="right-brand-timeline-container pt-12">
+              <div :class="['brand-grid', item.rightBrandGridClass || 'grid-2', { 'is-expanded': item.isRightExpanded }]">
+                <div v-for="(rBrand, rbIndex) in item.rightBrands" :key="rbIndex" :class="['brand-card', { 'hidden-card': rbIndex >= 16 }]" data-tilt>
+                  <div class="tilt-inner">
+                    <img v-if="rBrand.img" :src="rBrand.img" :alt="rBrand.name" class="brand-logo-img" style="max-width: 90%; max-height: 52px; object-fit: contain; display: block; margin: 0 auto;" />
+                    <template v-else><span class="brand-main" v-html="rBrand.name"></span></template>
+                  </div>
+                </div>
+              </div>
+              <div v-if="item.rightBrands.length > 16" class="expand-btn-wrapper mobile-only-btn">
+                <button class="expand-toggle-btn" @click="toggleRightExpand(item)">
+                  {{ item.isRightExpanded ? '收合品牌牆 ▲' : '展開更多品牌 ▼' }}
+                </button>
+              </div>
+            </div>
 
           <!-- 右側成果圖片 -->
           <div v-if="item.images && item.images.length" class="project-images-wrapper pt-12">
-            <div v-if="item.imageType === 'pc'" class="mockup-pc-container">
-              <div class="mockup-pc-card shadow-lg border border-slate-200 rounded">
-                <img :src="item.images[0]" :alt="item.title" class="project-img object-cover w-full h-full" />
+            <div v-if="item.imageType === 'pc'" class="mockup-pc-grid">
+              <div 
+                v-for="(img, imgIndex) in item.images" 
+                :key="imgIndex" 
+                class="mockup-pc-card shadow-lg border border-slate-200 rounded overflow-hidden mb-6"
+              >
+                <img :src="img" :alt="item.title" class="project-img object-cover w-full h-full" />
               </div>
             </div>
             <div v-if="item.imageType === 'mb'" class="mockup-mb-grid">
@@ -120,9 +141,9 @@
           </div>
 
           <!-- 右側專屬的「雙排跨界合作品牌牆」 -->
-          <div v-if="item.rightBrands && item.rightBrands.length" class="right-brand-timeline-container pt-12">
+          <div v-if="item.rightBrands && item.rightBrands.length && item.brandPosition === 'top'" class="right-brand-timeline-container pt-12">
             <!-- 💡 核心修改：右側也同步加上 .is-expanded 類別控制 -->
-            <div :class="['brand-grid grid-2', { 'is-expanded': item.isRightExpanded }]">
+            <div :class="['brand-grid', item.rightBrandGridClass || 'grid-2', { 'is-expanded': item.isRightExpanded }]">
               <div 
                 v-for="(rBrand, rbIndex) in item.rightBrands" 
                 :key="rbIndex"
@@ -177,9 +198,8 @@ const timelineData = reactive([
     brandGridClass: 'grid-4',
     isExpanded: false,
     maxHeightPx: 320, 
-    isExpanded: false,      // 左側展開狀態
-    isRightExpanded: false, // 💡 新增：右側展開狀態
-    // 左側 20 家品牌與對應 Logo 圖片
+    isExpanded: false,
+    isRightExpanded: false,
     brands: [
       { name: 'LCY GROUP', sub: '李長榮集團', accentClass: 'accent-amber', img: '/img/pic_03.jpg' },
       { name: 'RITEK 錸德集團', accentClass: 'accent-blue', img: '/img/pic_05.jpg' },
@@ -205,7 +225,8 @@ const timelineData = reactive([
     brandImages: ['/img/pic_62.jpg'],
     imageType: 'pc',
     images: ['/img/pic_20.jpg'],
-    
+
+    brandPosition: 'top',
     rightBrands: [
       { name: 'TIPA 智慧財產培訓學院', img: '/img/pic_39.jpg' },
       { name: '衛生福利部 全國解毒劑儲備網', img: '/img/pic_41.jpg' },
@@ -250,15 +271,19 @@ const timelineData = reactive([
     content: '兩年多的遠距上班，兼顧育兒與工作，同時在品牌端與用戶端有了更深的感受，並且加強了對女性/幼兒族群的調性掌握，進而在下個職場上(桑河)有如魚得水的發揮，與統一數網的合作，累積大量的媒體素材製作經驗，快速的產出動態banner、影音素材、產品活動網站等...',
     brandGridClass: 'grid-2',
     brands: [
-      { name: 'PЯESCO<sup>&reg;</sup>', accentClass: 'accent-red' },
-      { name: 'SOCIÉ', sub: 'esthetic', cardClass: 'font-serif block font-bold' }
+      { name: 'PЯESCO<sup>&reg;</sup>', accentClass: 'accent-red', img: '/img/pic_115.jpg' },
+      { name: 'SOCIÉ', sub: 'esthetic', cardClass: 'font-serif block font-bold', img: '/img/pic_117.jpg' }
+    ],
+    rightBrands: [
+      { name: 'PЯESCO<sup>&reg;</sup>', accentClass: 'accent-red', img: '/img/pic_120.jpg' },
+      { name: 'SOCIÉ', sub: 'esthetic', cardClass: 'font-serif block font-bold', img: '/img/pic_123.jpg' }
     ],
     brandImages: [
-      'https://unsplash.com'
+      '/img/pic_125.jpg'
     ],
     imageType: 'pc',
     images: [
-      'https://unsplash.com'
+      '/img/pic_129.jpg'
     ]
   },
   {
@@ -269,24 +294,54 @@ const timelineData = reactive([
     techStack: 'HTML5,CSS3,jQuery,RWD,Premiere,Audition',
     content: '視覺設計跨足前端設計，除了 RWD 還有許多的套件 & 特效需要用在網站中，單純的一頁式網站中包含著各種元件的運用，社群的興起也帶來另一種媒體素材的走向。',
     brandGridClass: 'grid-3 pt-16',
+    rightBrandGridClass: 'grid-4',
     brands: [
-      { name: '■● KOSÉ', cardClass: 'span-3 border-none bg-transparent font-serif tracking-widest text-lg font-bold text-slate-700' },
-      { name: 'DECORTÉ', cardClass: 'font-serif tracking-wider' },
-      { name: 'INFINITY<br><small style="font-size:8px;font-weight:normal;">KOSÉ</small>', cardClass: 'font-serif tracking-tight font-bold' },
-      { name: 'ESPRIQUE', cardClass: 'font-sans tracking-wide' },
-      { name: '雪肌精', sub: 'SEKKISEI', accentClass: 'text-blue-800 font-bold' },
-      { name: 'SEKKISEI', sub: 'CLEAR WELLNESS', accentClass: 'text-blue-900 tracking-widest font-mono' },
-      { name: '雪肌精 みやび', cardClass: 'font-serif italic text-blue-950' },
-      { name: 'ONE BY KOSÉ', cardClass: 'font-sans text-xs' },
-      { name: 'Visée', cardClass: 'font-serif italic text-md' },
-      { name: 'Fasio', cardClass: 'font-black tracking-widest uppercase' }
+      { name: 'KOSÉ', sub: '高絲', img: '/img/pic_133.jpg', cardClass: 'span-3 border-none bg-transparent' }, 
+      { name: 'DECORTÉ', sub: '黛珂', img: '/img/pic_148.jpg' },
+      { name: 'INFINITY<br><small style="font-size:8px;font-weight:normal;">KOSÉ</small>', sub: 'KOSÉ', img: '/img/pic_150.jpg', cardClass: 'font-serif tracking-tight font-bold' },
+      { name: 'ESPRIQUE', sub: '豐靡美姬', img: '/img/pic_152.jpg', cardClass: 'font-sans tracking-wide' },
+      { name: '雪肌精', sub: 'SEKKISEI', img: '/img/pic_160.jpg', accentClass: 'text-blue-800 font-bold' },
+      { name: 'SEKKISEI', sub: 'CLEAR WELLNESS', img: '/img/pic_161.jpg', accentClass: 'text-blue-900 tracking-widest font-mono' },
+      { name: '雪肌精 みやび', sub: 'SEKKISEI MIYABI', img: '/img/pic_162.jpg', cardClass: 'font-serif italic text-blue-950' },
+      { name: 'ONE BY KOSÉ', sub: '', img: '/img/pic_174.jpg' },
+      { name: 'Visée', sub: '', img: '/img/pic_175.jpg' },
+      { name: 'FASIO', sub: '', img: '/img/pic_176.jpg' },
+      { name: 'NAIL HOLIC', sub: '', img: '/img/pic_188.jpg' },
+      { name: 'JILLSTUART', sub: '', img: '/img/pic_189.jpg' }
+    ],
+    rightBrands: [
+      { name: 'UNIQLO / GU', sub: 'LifeWear', img: '/img/pic_135.jpg' },
+      { name: 'Nespresso', sub: '雀巢咖啡', img: '/img/pic_137.jpg' },
+      { name: 'Standard Foods', sub: '佳格食品', img: '/img/pic_139.jpg' },
+      { name: '白蘭氏', sub: 'Brand’s', img: '/img/pic_141.jpg' },
+      { name: 'ESTÉE LAUDER', sub: '雅詩蘭黛', img: '/img/pic_153.jpg' },
+      { name: 'Karihome', sub: '卡洛塔妮', img: '/img/pic_154.jpg' },
+      { name: 'CLARINS', sub: '克蘭詩', img: '/img/pic_155.jpg' },
+      { name: 'Za', sub: '姬芮', img: '/img/pic_156.jpg' },
+      { name: 'QUAKER', sub: '桂格', img: '/img/pic_167.jpg' },
+      { name: '天地合補', sub: '', img: '/img/pic_168.jpg' },
+      { name: 'LANEIGE', sub: '蘭芝', img: '/img/pic_169.jpg' },
+      { name: 'uno', sub: '吾諾', img: '/img/pic_170.jpg' },
+      { name: 'KNT TRAVEL', sub: '近畿日本旅客', img: '/img/pic_181.jpg' },
+      { name: 'SANGEAN', sub: '山進電子', img: '/img/pic_182.jpg' },
+      { name: 'CLINIQUE', sub: '倩碧', img: '/img/pic_183.jpg' },
+      { name: 'KATE TOKYO', sub: '凱婷', img: '/img/pic_184.jpg' }
     ],
     brandImages: [
-      'https://unsplash.com'
+      '/img/pic_195.jpg',
+      '/img/pic_199.jpg',
+      '/img/pic_200.jpg',
+      '/img/pic_203.jpg',
+      '/img/pic_206.jpg'
     ],
     imageType: 'pc',
     images: [
-      'https://unsplash.com'
+      '/img/pic_201.jpg',
+      '/img/pic_202.jpg',
+      '/img/pic_204.jpg',
+      '/img/pic_205.jpg',
+      '/img/pic_207.jpg',
+      '/img/pic_208.jpg'
     ]
   },
   {
@@ -297,19 +352,14 @@ const timelineData = reactive([
     techStack: 'Nuxt,Vue,Vuetify,VS Code,Gitlab,HTML,SCSS,JS',
     content: '從傳統切版要轉換框架切版時，公司也正在將產品從 php 轉為 H5，感謝郭主管無私的指導帶領下，與後端團隊共同成長，讓我在前端技術上有卓越的提升，如今框架技術成熟普及及加上各類 ai 輔助，已能大幅縮短各種功能與效果的產出時間，多語系排版更加考驗切版彈性.',
     brandGridClass: 'grid-4 pt-12',
-    brands: [
-      { name: 'UNIQLO', sub: 'LifeWear', accentClass: 'text-red-600 font-bold border border-red-600 p-0.5 text-[9px] leading-tight' },
-      { name: 'N', cardClass: 'bg-black text-white italic text-lg font-serif' },
-      { name: '● STANDARD FOODS', accentClass: 'text-green-700 font-black tracking-tighter' },
-      { name: '白蘭氏', cardClass: 'bg-emerald-900 text-white font-bold' }
-    ],
     brandImages: [
-      'https://unsplash.com'
+      '/img/pic_211.jpg',
+      '/img/pic_215.jpg'
     ],
-    imageType: 'mb',
+    imageType: 'pc',
     images: [
-      'https://unsplash.com',
-      'https://unsplash.com'
+      '/img/pic_213.jpg',
+      '/img/pic_214.jpg'
     ]
   },
   {
@@ -319,13 +369,13 @@ const timelineData = reactive([
     subtitle: '加入您的團隊，迎接新挑戰！',
     techStack: '',
     content: '準備就緒，期待能將多年的前端架構實力、UI 彈性切版經驗與 AI 自動化工作流帶入貴團隊。',
-    brandImages: [
-      'https://unsplash.com'
-    ],
-    imageType: 'pc',
-    images: [
-      'https://unsplash.com'
-    ]
+    // brandImages: [
+    //   'https://unsplash.com'
+    // ],
+    // imageType: 'pc',
+    // images: [
+    //   'https://unsplash.com'
+    // ]
   }
 ])
 
@@ -473,6 +523,8 @@ onMounted(async () => {
             }
           }
         )
+
+        // 文字效果
         const timelineItems = gsap.utils.toArray('.timeline-item')
         timelineItems.forEach((item, index) => {
           const chars = item.querySelectorAll('.char-item')
@@ -481,11 +533,10 @@ onMounted(async () => {
           const mobileContent = item.querySelector('.mobile-only-content')
           const desktopContent = item.querySelector('.desktop-only-content')
           
-          // 💡 圖片從這裡抽離！textGroup 現在只純粹控制文字內容
+          // textGroup 現在只純粹控制文字內容
           const textGroup = [mobileHeader, desktopHeader, mobileContent, desktopContent].filter(Boolean)
           const isLastItem = index === timelineItems.length - 1
-          const isSecondToLastItem = index === timelineItems.length - 2
-    
+
           if (index === 0) {
             const tl = gsap.timeline({
               scrollTrigger: {
@@ -495,26 +546,36 @@ onMounted(async () => {
             if (chars.length) {
               tl.fromTo(chars,
                 { opacity: 0, y: 40, scale: 0.5, rotationX: -45 },
-                { opacity: 1, y: 0, scale: 1, rotationX: 0, ease: 'power2.out', duration: 0.6, stagger: 0.15 }
+                { opacity: 1, y: 0, scale: 1, rotationX: 0, ease: 'power2.out', duration: 0.5, stagger: 0.1 }
               )
             }
             tl.fromTo(textGroup, { opacity: 0, y: 55 }, { opacity: 1, y: 0, duration: 1.6, ease: 'power2.out' }, '<=0.3')
-          } else {
-            const endPosition = (isLastItem || isSecondToLastItem) ? 'bottom bottom' : 'top 5%'
+                    } else {
+            // 🚀 改用 timeline 搭配 toggleActions 模式，徹底終結 scrub 造成的長內容卡死問題
             const tl = gsap.timeline({
               scrollTrigger: {
-                trigger: item, start: 'top 85%', end: endPosition, scrub: 2.0, invalidateOnRefresh: true
+                trigger: item, 
+                start: 'top 85%', // 只要區塊一露頭
+                
+                // ✨ 核心神技：play (進入時播完) / none / restart (返回時重播) / none
+                // 這樣滑過去一定 100% 跑完，往回滑再滑下來還能再跑一次，體感極好！
+                toggleActions: 'play none restart none', 
+                invalidateOnRefresh: true
               }
             })
             if (chars.length) {
+              // 💡 固定 duration 時間（0.6秒），確保完全不受右側長度干擾，必定秒速出齊
               tl.fromTo(chars,
                 { opacity: 0, y: 40, scale: 0.5, rotationX: -45 },
-                { opacity: 1, y: 0, scale: 1, rotationX: 0, ease: 'power2.out', stagger: 0.2 }
+                { opacity: 1, y: 0, scale: 1, rotationX: 0, ease: 'power2.out', duration: 0.6, stagger: 0.1 }
               )
             }
-            tl.fromTo(textGroup, { opacity: 0, y: 55 }, { opacity: 1, y: 0, ease: 'power2.out' }, '<=0.2')
+            tl.fromTo(textGroup, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 1.2, ease: 'power2.out' }, '<=0.15')
           }
+
+
         })
+
     
         // D. 全新增加：成果圖片獨立滑動判定動畫 (全面兼容電腦與手機版)
         // 同步抓取專案成果圖的所有 PC 卡片與 Mobile 卡片外殼
@@ -536,8 +597,8 @@ onMounted(async () => {
               scrollTrigger: {
                 trigger: card,      // 💡 關鍵：以「圖片自己」作為滾動觸發目標
                 start: 'top 88%',   // 當圖片頂部進入螢幕下方 12% (即 88% 處) 時立刻被點亮
-                // toggleActions: 'play none none none', // 滾過就固定亮起，確保看作品時體驗最安定
-                toggleActions: 'play reverse play reverse', 
+                toggleActions: 'play none none reverse', // 滾過就固定亮起，確保看作品時體驗最安定
+                // toggleActions: 'play reverse play reverse', 
                 invalidateOnRefresh: true
               }
             }
