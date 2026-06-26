@@ -334,3 +334,16 @@ $font-mono: monospace;
     display: none !important; // 💡 電腦版時，按鈕徹底灰飛煙滅，不佔用任何空間
   }
 }
+
+
+// 逐字飛入
+.date-year {
+  display: inline-block;
+  
+  // ✨ 逐字飛入的單個字元樣式
+  .char-item {
+    display: inline-block;
+    white-space: pre; // 💡 防止空格或特殊符號在拆解時塌陷
+    will-change: transform, opacity; // 💡 開啟瀏覽器硬體加速
+  }
+}

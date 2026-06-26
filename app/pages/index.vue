@@ -28,7 +28,20 @@
         <!-- 【左側區塊】：包含日期、手機標題、左側 3D 品牌牆 -->
         <div class="item-left-block">
           <div class="date-header">
-            <span class="date-year">{{ item.year }}</span>
+            <!-- 修改前： -->
+            <!-- <span class="date-year">{{ item.year }}</span> -->
+            
+            <!-- ✨ 修改後：將文字拆開，並統一加上用於 GSAP 辨識的類別名稱 -->
+            <span class="date-year">
+              <span 
+                v-for="(char, charIndex) in item.year" 
+                :key="charIndex" 
+                class="char-item"
+              >
+                {{ char }}
+              </span>
+            </span>
+
             <span class="date-tech">{{ item.techHeader }}</span>
           </div>
 
@@ -369,7 +382,7 @@ onMounted(async () => {
             ease: 'none', 
             scrollTrigger: {
               trigger: '.timeline-main',
-              start: 'top top',       
+              start: 'top 30%',       
               end: 'bottom bottom',
               scrub: true,
               invalidateOnRefresh: true,
@@ -392,7 +405,87 @@ onMounted(async () => {
             }
           }
         )
-
+        
+        // 🔥 智慧分流：首項（自動跑 + 返回重播）+ 後續（完全沿用您的滾輪咬合程式碼）
+        gsap.utils.toArray('.timeline-item').forEach((item, index) => {
+          // 抓取當前項目底下的所有單字元 span
+          const chars = item.querySelectorAll('.char-item')
+          if (!chars.length) return
+        
+          // 💡 情況 A：如果是最頂端的第一個項目 (index === 0)
+          if (index === 0) {
+            gsap.fromTo(chars,
+              {
+                opacity: 0,       
+                y: 40,            
+                scale: 0.5,       
+                rotationX: -45,   
+              },
+              {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                rotationX: 0,
+                ease: 'power2.out', 
+                duration: 0.6,      
+                stagger: 0.15,      
+                
+                scrollTrigger: {
+                  trigger: item,
+                  start: 'top 95%',  // 💡 當這個區塊有 5% 進入畫面（幾乎一到頂）就觸發
+                  
+                  // ✨ 關鍵魔術：
+                  // play (第一次進入播放) / none (離開時不做事) / restart (返回時重新播放) / none (往回離開不做事)
+                  toggleActions: 'play none restart none', 
+                  
+                  // ❌ 注意：這裡「不要」加 scrub: 1，這樣它返回時才會是用固定時間「帥氣飛入跑一次」，而不是死咬滾輪
+                  invalidateOnRefresh: true,
+                  markers: false
+                }
+              }
+            )
+          } 
+          // 💡 情況 B：其餘項目，100% 完全套用您提供的原始程式碼與滾輪咬合設定
+          else {
+            gsap.fromTo(chars,
+              {
+                opacity: 0,       // 一開始完全隱形
+                y: 40,            // 從下方 40px 的地方（改從下方往上飛，滑動感更強）
+                scale: 0.5,       // 一開始縮小到 50%
+                rotationX: -45,   // 帶有 3D 翻轉的俯視角度
+              },
+              {
+                opacity: 1,
+                y: 0,
+                scale: 1,
+                rotationX: 0,
+                ease: 'power2.out', // 💡 改用滑順平緩的非線性曲線
+                
+                scrollTrigger: {
+                  trigger: item,       // 以該時間軸區塊為偵測目標
+                  
+                  // 💡 調整觸發區間：
+                  // 當區塊頂部到達螢幕下方 75% 時開始飛入第一個字
+                  // 當區塊頂部到達螢幕中間 60% 時，全部的字剛好完美飛完
+                  start: 'top 75%',    
+                  end: 'top 60%',      
+                  
+                  // 🚀 核心流暢優化：將 scrub 改為 1（代表 1 秒的平滑跟隨延遲）
+                  // 這會讓滑動時文字產生像「拉果凍」一樣滑順、高級的逐字浮現感
+                  scrub: 1,            
+                  
+                  invalidateOnRefresh: true,
+                  markers: false             
+                },
+                
+                // 🚀 核心靈魂：拉大交錯時間差（從 0.04 放大到 0.2）
+                // 這會拉開字與字之間的動畫順序，讓「逐字飛入」的獨立感非常清晰
+                stagger: 0.2 
+              }
+            )
+          }
+        })
+        
         console.log('GSAP 與 ScrollTrigger 順利載入並初始化成功！')
       } else {
         setTimeout(initGsapAnimation, 50)
