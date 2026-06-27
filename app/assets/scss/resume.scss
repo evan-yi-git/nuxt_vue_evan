@@ -10,7 +10,7 @@ $font-mono: monospace;
   min-height: 100vh; background-color: $bg-color; color: $text-dark;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   padding-bottom: 80px; box-sizing: border-box;
-  background: url('img/top_banner_bg.jpg') no-repeat top right / 100%;
+  background: url('/img/top_banner_bg.jpg') no-repeat top right / 100%;
 }
 
 .resume-header {
@@ -357,4 +357,165 @@ $font-mono: monospace;
     // 💡 核心進化：強制綁定全域呼吸動畫，無限循環 (infinite)，每次呼吸花 3 秒 (3s)
     animation: glowBreath 3s infinite ease-in-out;
   }
+}
+
+.go-top-wrapper {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 52px;  // 稍微加大一點點，容納外圈圓環
+  height: 52px;
+  border-radius: 50%;
+  background-color: rgba(30, 41, 59, 0.88); // 質感深色半透明基底
+  cursor: pointer;
+  z-index: 999;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  
+  // 按鈕整體的進場淡入效果
+  opacity: 0;
+  transform: translateY(20px) scale(0.8);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, box-shadow 0.3s ease;
+
+  &.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  // 1. SVG 大外殼
+  .progress-circle {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    // 💡 核心魔術：逆時針旋轉 90 度，強迫進度圓環的起點在正頂端 12 點鐘方向！
+    transform: rotate(-90deg); 
+  }
+
+  // 2. 靜態灰色底圈
+  .progress-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.15); // 淡淡的底色
+    stroke-width: 4; // 邊框粗細
+  }
+
+  // 3. 動態藍色進度圈
+  .progress-bar {
+    fill: none;
+    stroke: #5a9cda; // 您最愛的主題藍色！
+    stroke-width: 4;
+    stroke-linecap: round; // 💡 讓進度條的尖端呈現高級的圓弧狀，而不是生硬的切面
+    
+    // 設定虛線總長（對應 2 * Math.PI * 44）
+    stroke-dasharray: 276.46; 
+    
+    // 💡 超滑順跟隨：加入 0.1 秒的微幅 CSS 轉場，消除滑輪滾動時的鋸齒跳動感
+    transition: stroke-dashoffset 0.1s linear; 
+  }
+
+  // 4. 中間的三角形文字
+  .arrow-text {
+    color: #ffffff;
+    font-size: 1rem;
+    z-index: 2;
+    transition: transform 0.3s ease, color 0.3s ease;
+  }
+
+  // 滑鼠滑過（Hover）時的頂級發光微互動
+  &:hover {
+    background-color: rgba(30, 41, 59, 0.95);
+    transform: translateY(-4px) scale(1.05); 
+    box-shadow: 0 8px 24px rgba(90, 156, 218, 0.45); // 點亮藍色外圍光暈
+
+    .progress-bar {
+      stroke: #72b1ec; // 懸浮時進度環變更亮
+    }
+    .arrow-text {
+      color: #5a9cda; // 箭頭轉為藍色
+      transform: translateY(-2px); // 箭頭向上微跳動
+    }
+  }
+}
+
+// 🔥 究極連動：當整頁觸底、文字散發 5px 懸浮呼吸光時，GoTop 按鈕圓環也跟著全面點亮！
+.resume-wrapper.is-bottom .go-top-wrapper {
+  box-shadow: 0 0 20px rgba(90, 156, 218, 0.7);
+  
+  .progress-bar {
+    stroke: #5a9cda !important;
+    filter: drop-shadow(0 0 4px rgba(90, 156, 218, 0.8)); // 💡 圓環本身同步加上高亮霓虹燈發光！
+  }
+}
+
+/* 全螢幕遮罩層 */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #111827; /* 深色質感底，可依專案風格調整 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999; /* 確保絕對在最上層 */
+}
+
+/* 簡單的文字或轉圈特效 */
+.loading-text {
+  color: #ffffff;
+  font-size: 1.5rem;
+  letter-spacing: 0.1em;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+/* Vue 的 Transition 淡出動畫 */
+.fade-leave-active {
+  transition: opacity 0.5s ease;
+}
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* 修改原有的 loading 元件配置 */
+.loading-content {
+  text-align: center;
+  width: 280px; /* 固定寬度讓進度條比較好延伸 */
+}
+
+.loading-text {
+  display: block;
+  color: #ffffff;
+  font-size: 1.1rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  font-family: monospace; /* 用等寬字體，數字變動時才不會抖動 */
+}
+
+/* 💡 進度條外殼 */
+.progress-bar-wrapper {
+  width: 100%;
+  height: 6px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* 💡 進度條內條（跑動主體） */
+.progress-bar-fill {
+  height: 100%;
+  width: 0%; /* 由 Vue 動態控制 */
+  background: linear-gradient(90deg, #3b82f6, #60a5fa); /* 漂亮漸層藍 */
+  box-shadow: 0 0 8px #3b82f6; /* 發光科技感 */
+  border-radius: 10px;
+  transition: width 0.15s ease-out; /* 關鍵：讓進度條前進時有柔和的平滑動畫，不卡頓 */
 }
