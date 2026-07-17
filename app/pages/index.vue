@@ -1,33 +1,12 @@
 <template>
   <div>
-    <Transition name="fade">
-      <div v-if="isLoading" class="loading-overlay">
-        <div class="loading-content">
-          <span class="loading-text">Loading {{ loadingProgress }}%</span>
-          
-          <div class="progress-bar-wrapper">
-            <div class="progress-bar-fill" :style="{ width: loadingProgress + '%' }"></div>
-          </div>
-        </div>
-      </div>
-    </Transition>
+    <!-- 1. 載入動畫元件 (綁定狀態) -->
+    <LoadingOverlay :is-loading="isLoading" :loading-progress="loadingProgress" />
+
     <div class="resume-wrapper">
       
-      <header class="resume-header">
-        <div class="header-container">
-          <div class="header-left">
-            <h1 class="name">尹俊哲</h1>
-            <p class="nickname">大吉 / Evan</p>
-          </div>
-          <div class="avatar-box">
-            <img src="/img/pic_00.jpg" alt="尹俊哲" class="project-img object-cover w-full h-full" />
-          </div>
-          <div class="header-right">
-            <h2 class="job-title">前端設計師</h2>
-            <p class="skills">前端程式 / 網頁設計</p>
-          </div>
-        </div>
-      </header>
+      <!-- 2. 頁首元件 -->
+      <ResumeHeader />
   
       <main class="timeline-main">
         <div class="timeline-axis">
@@ -183,35 +162,14 @@
   
         </div>
       </main>
-  
-      <footer class="resume-footer">
-        <p class="thank-you-text">感謝您觀看我的履歷～祝您有愉快的一天</p>
-      </footer>
+
+      <!-- 3. 頁尾元件 -->
+      <ResumeFooter />
       
-      <!-- GoTop 按鈕 -->
-      <div 
-        class="go-top-wrapper" 
-        :class="{ 'is-visible': isGoTopVisible }"
-        @click="scrollToTop"
-      >
-        <svg class="progress-circle" viewBox="0 0 100 100">
-          <!-- 1. 靜態背景圓圈（淡淡的底色） -->
-          <circle class="progress-bg" cx="50" cy="50" r="44"></circle>
-          <!-- 2. 動態進度圓圈（隨滾輪注入藍色） -->
-          <circle 
-            class="progress-bar" 
-            cx="50" 
-            cy="50" 
-            r="44" 
-            :style="{ strokeDashoffset: strokeOffset }"
-          ></circle>
-        </svg>
-        <!-- 中間的箭頭文字 -->
-        <span class="arrow-text">▲</span>
-      </div>
+      <!-- 4. GoTop 按鈕元件 -->
+      <GoTopButton />
   
     </div>
-
   </div>
 </template>
 
@@ -220,16 +178,15 @@ import { reactive, nextTick, onMounted } from 'vue'
 import { timelineRawData } from '~~/data/timeline'
 import { initResumeAnimations, initVanillaTilt, refreshScrollTrigger } from '~/utils/animation'
 
-// 1. 滾動進度條與資料
-const { isGoTopVisible, strokeOffset, scrollToTop } = useScrollProgress()
+// 1. 初始化資料
 const timelineData = reactive(timelineRawData)
 
-// 2. 引入 Loading 控制（傳入「完成時要執行的動畫」作為參數）
+// 2. 引入 Loading 控制
 const { isLoading, loadingProgress, initLoadingManager } = useLoadingProgress(() => {
   initResumeAnimations()
 })
 
-// 3. 點擊展開事件（代碼變得很乾淨）
+// 3. 點擊展開事件
 const toggleExpand = async (item) => {
   item.isExpanded = !item.isExpanded
   await nextTick()
@@ -244,11 +201,10 @@ const toggleRightExpand = async (item) => {
   refreshScrollTrigger()
 }
 
-// 4. 生命週期監聽
+// 4. 生命週期掛載
 onMounted(async () => {
   await nextTick()
   await initVanillaTilt() 
   initLoadingManager() // 啟動管理者
 })
 </script>
-

@@ -489,7 +489,19 @@ $font-mono: monospace;
   text-align: center;
   width: 280px; /* 固定寬度讓進度條比較好延伸 */
 }
-
+.evan-loading-icon {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  margin-bottom: 24px;
+  object-fit: cover;
+  
+  /* 柔和發光質感，可選 */
+  filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.3)); 
+  
+  /* 啟用原地順時針旋轉動畫，4秒轉一圈 */
+  animation: spinAround 4s linear infinite; 
+}
 .loading-text {
   display: block;
   color: #ffffff;
@@ -499,7 +511,14 @@ $font-mono: monospace;
   margin-bottom: 12px;
   font-family: monospace; /* 用等寬字體，數字變動時才不會抖動 */
 }
-
+@keyframes spinAround {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
 /* 💡 進度條外殼 */
 .progress-bar-wrapper {
   width: 100%;
