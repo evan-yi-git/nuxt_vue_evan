@@ -10,7 +10,7 @@
             </div>
             <div class="header-right">
                 <h2 class="job-title">前端設計師</h2>
-                <p class="skills">前端程式 / 網頁設計</p>
+                <p class="skills">前端動態 / 網頁設計</p>
             </div>
         </div>
     </header>
